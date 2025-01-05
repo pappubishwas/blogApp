@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.example.blogapp.Fragments.Blogs;
 import com.example.blogapp.R;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -33,6 +35,7 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         showUserProfile();
     }
 
+
     private void setupDrawer() {
         // Initially load the Home fragment
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -44,6 +47,19 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
             @Override
             public void onClick(View v) {
                 binding.drawer.openDrawer(Gravity.LEFT);
+            }
+        });
+
+        binding.profileIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate to the Profile fragment
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.frame_layout, new Profile());
+                fragmentTransaction.commit();
+
+                // Optionally, close the drawer after selecting the profile
+                binding.drawer.closeDrawer(GravityCompat.START);
             }
         });
 
@@ -73,6 +89,10 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
         } else if (id == R.id.nav_profile) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.frame_layout, new Profile());
+            fragmentTransaction.commit();
+        }else if(id== R.id.nav_blogs){
+            FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout,new Blogs());
             fragmentTransaction.commit();
         }
 

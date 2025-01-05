@@ -27,6 +27,8 @@ import com.example.blogapp.databinding.FragmentPublishBinding;
 
 import java.util.Date;
 import java.util.HashMap;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class Publish extends Fragment {
 
@@ -104,6 +106,8 @@ public class Publish extends Fragment {
                     String title = binding.bTittle.getText().toString();
                     String desc = binding.bDesc.getText().toString();
                     String author = binding.bAuthor.getText().toString();
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    String userId = user != null ? user.getUid() : "anonymous";
 
                     if (filepath != null) {
                         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -127,6 +131,7 @@ public class Publish extends Fragment {
                                         map.put("img", file_url);
                                         map.put("timestamp", String.valueOf(System.currentTimeMillis()));
                                         map.put("share_count", "0");
+                                        map.put("userId", userId);
 
                                         FirebaseFirestore.getInstance().collection("Blogs").document().set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

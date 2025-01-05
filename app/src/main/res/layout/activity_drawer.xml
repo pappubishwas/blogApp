@@ -16,7 +16,10 @@
             android:id="@+id/menu_icon"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_margin="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="15dp"
             android:src="@drawable/ic_menu_icon" />
 
         <androidx.cardview.widget.CardView

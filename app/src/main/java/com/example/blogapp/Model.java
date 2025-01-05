@@ -1,9 +1,9 @@
 package com.example.blogapp;
 
 public class Model {
-    String tittle, desc, author, date, img, share_count,id,timestamp;
+    String tittle, desc, author, date, img, share_count,id,timestamp,userId;
 
-    public Model(String tittle, String desc, String author, String date, String img, String share_count, String id, String timestamp) {
+    public Model(String tittle, String desc, String author, String date, String img, String share_count, String id, String timestamp,String userId) {
         this.tittle = tittle;
         this.desc = desc;
         this.author = author;
@@ -12,6 +12,7 @@ public class Model {
         this.share_count = share_count;
         this.id = id;
         this.timestamp = timestamp;
+        this.userId=userId;
     }
 
     public String getTimestamp() {
@@ -79,5 +80,9 @@ public class Model {
 
     public void setShare_count(String share_count) {
         this.share_count = share_count;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 }
