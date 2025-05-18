@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Blog App</string>
+    <string name="app_name">LearnLog</string>
     <string name="title_activity_drawer_actvity">DrawerActvity</string>
     <string name="nav_header_title">Blog App</string>
     <string name="nav_header_subtitle">youtube.com/artorean</string>

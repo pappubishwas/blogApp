@@ -52,18 +52,15 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         Model model = list.get(position);
         holder.title.setText(model.getTittle());
         holder.date.setText(model.getDate());
-        holder.share_count.setText(model.getShare_count());
+        holder.share_count.setText("Shares: " + model.getShare_count());
         holder.author.setText(model.getAuthor());
 
         Glide.with(holder.author.getContext()).load(model.getImg()).into(holder.img);
 
-//        holder.itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(holder.author.getContext(), BlogDetail.class);
-//                intent.putExtra("id", model.getId());
-//                holder.author.getContext().startActivity(intent);
-//            }
+//        holder.author.setOnClickListener(v -> {
+//            Intent intent = new Intent(v.getContext(), BloggerProfileActivity.class);
+//            intent.putExtra("author_id", model.getUserId()); // Pass user ID for the profile
+//            v.getContext().startActivity(intent);
 //        });
 
         // Get the current user's ID
@@ -181,6 +178,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         });
     }
 
+
     @Override
     public int getItemCount() {
         return list.size();
@@ -188,7 +186,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView img;
-        TextView date, title, share_count, author;
+        TextView date, title, share_count, likes_count, author;
+
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -201,4 +200,5 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         }
     }
+
 }

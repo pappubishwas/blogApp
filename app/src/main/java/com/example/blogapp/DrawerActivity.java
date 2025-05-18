@@ -19,6 +19,9 @@ import com.example.blogapp.Fragments.Publish;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class DrawerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -68,9 +71,34 @@ public class DrawerActivity extends AppCompatActivity implements NavigationView.
     }
 
     private void showUserProfile() {
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+        // ✅ Google Sign-In Check
         account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null) {
+        if (account != null && account.getPhotoUrl() != null) {
             Glide.with(this).load(account.getPhotoUrl()).into(binding.profileIcon);
+            return;
+        }
+
+        // ✅ Firestore Realtime Listener
+        if (currentUser != null) {
+            String userId = currentUser.getUid();
+            firestore.collection("users").document(userId)
+                    .addSnapshotListener((documentSnapshot, e) -> {
+                        if (e != null) return;
+                        if (documentSnapshot != null && documentSnapshot.exists()) {
+                            String profileImageUrl = documentSnapshot.getString("profileImageUrl");
+                            if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                                Glide.with(this).load(profileImageUrl).into(binding.profileIcon);
+                            } else {
+                                binding.profileIcon.setImageResource(R.drawable.side_nav_bar);
+                            }
+                        }
+                    });
+        } else {
+            binding.profileIcon.setImageResource(R.drawable.side_nav_bar);
         }
     }
 

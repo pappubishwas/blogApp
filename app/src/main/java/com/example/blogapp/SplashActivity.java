@@ -10,7 +10,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.blogapp.databinding.ActivitySplashBinding;
@@ -54,6 +56,9 @@ public class SplashActivity extends AppCompatActivity {
         }
 
 
+        // Handle "Forgot Password?" click
+        binding.tvForgotPassword.setOnClickListener(v -> showForgotPasswordDialog());
+
         // Handle "Continue with Google" button click
         binding.btnGoogleSignIn.setOnClickListener(v -> signinWithGoogle());
 
@@ -89,24 +94,58 @@ public class SplashActivity extends AppCompatActivity {
         String email = binding.etEmail.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
 
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Please fill out both Email and Password fields", Toast.LENGTH_SHORT).show();
+        // **Validation**
+        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.etEmail.setError("Enter a valid email");
             return;
         }
 
-        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                FirebaseUser user = auth.getCurrentUser();
-                if (user != null) {
-                    Log.d("SplashActivity", "Logged in user: " + user.getEmail());
-                    Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
-                    navigateToHome();
-                }
-            } else {
-                Toast.makeText(this, "Login Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (TextUtils.isEmpty(password) || password.length() < 8) {
+            binding.etPassword.setError("Enter a valid password (at least 8 characters)");
+            return;
+        }
 
+        // **Login with Firebase**
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnSuccessListener(authResult -> {
+                    FirebaseUser user = auth.getCurrentUser();
+
+                    if (user != null) {
+                        if (user.isEmailVerified()) {
+                            Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                            navigateToHome();
+                        } else {
+                            Toast.makeText(this, "Please verify your email before logging in.", Toast.LENGTH_LONG).show();
+                            showResendVerificationDialog(user);
+                            auth.signOut(); // Sign out user since they are not verified
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Login Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    // **Show Resend Verification Dialog**
+    private void showResendVerificationDialog(FirebaseUser user) {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Email Not Verified")
+                .setMessage("Would you like to resend the verification email?")
+                .setPositiveButton("Resend", (dialog, which) -> sendVerificationEmail(user))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    // **Resend Verification Email**
+    private void sendVerificationEmail(FirebaseUser user) {
+        user.sendEmailVerification()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Verification email sent. Please check your inbox.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, "Failed to resend verification email.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override
@@ -129,6 +168,41 @@ public class SplashActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void showForgotPasswordDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Reset Password");
+
+        // Create an input field for email
+        final EditText input = new EditText(this);
+        input.setHint("Enter your email");
+        builder.setView(input);
+
+        // Set "Send Reset Link" button
+        builder.setPositiveButton("Send", (dialog, which) -> {
+            String email = input.getText().toString().trim();
+            if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Enter a valid email!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Send reset email
+            auth.sendPasswordResetEmail(email)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(this, "Password reset link sent! Check your email.", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(this, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        });
+
+        // Set "Cancel" button
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+
+        // Show the dialog
+        builder.show();
     }
 
     private void navigateToHome() {

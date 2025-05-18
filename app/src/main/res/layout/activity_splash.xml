@@ -68,6 +68,19 @@
             android:inputType="textPassword"
             android:padding="12dp"
             android:layout_marginBottom="24dp" />
+        <TextView
+            android:id="@+id/tvForgotPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Forgot Password?"
+            android:textColor="@color/blue"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="end"
+            android:clickable="true"
+            android:focusable="true"/>
+
 
         <Button
             android:id="@+id/btnLogin"
@@ -93,6 +106,7 @@
             android:text="Continue with Google"
             android:backgroundTint="@android:color/holo_blue_light"
             android:textColor="@android:color/white" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
